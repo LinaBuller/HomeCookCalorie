@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">CKkal</string>
+    <string name="kkal">Calories</string>
+    <string name="fats">Fats</string>
+    <string name="carbs">Carbs</string>
+    <string name="proteins">Proteins</string>
+    <string name="weight">Weight</string>
+    <string name="name_ingredient">Name ingredient</string>
+
+    <string name="home">Home</string>
+    <string name="saved_dishes">Saved dishes</string>
+    <string name="profile">Profile</string>
+    <string name="copy_nutrient_title">Press for copy</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="add_ingredient">Add ingredient</string>
+    <string name="next_step">Next step</string>
+    <string name="no_ingredient">No ingredients available</string>
+    <string name="edit_ingredient">Edit ingredient</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_ingredient">Delete this ingredient?</string>
+    <string name="delete_dish">Do you want delete this dish?</string>
+    <string name="edit_dish">Edit this dish</string>">
+    <string name="rec_calories">Recommended calories:</string>">
+    <string name="comment_calc_calories">* 1 gram of fat contains 9 kcal 1 gram of protein contains 4 kcal, and 1 gram of carbohydrates contains 4 kcal.</string>">
+
+</resources>
