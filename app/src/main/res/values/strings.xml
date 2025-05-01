@@ -1,16 +1,17 @@
 <resources>
-    <string name="app_name">CKkal</string>
+    <string name="app_name">Cook &amp; Calc</string>
     <string name="kkal">Calories</string>
     <string name="fats">Fats</string>
     <string name="carbs">Carbs</string>
     <string name="proteins">Proteins</string>
-    <string name="weight">Weight</string>
-    <string name="name_ingredient">Name ingredient</string>
+    <string name="weight">Weight, g</string>
+    <string name="ingredient_name">Ingredient Name</string>
+    <string name="dish_name">Dish Name</string>
 
     <string name="home">Home</string>
     <string name="saved_dishes">Saved dishes</string>
-    <string name="profile">Profile</string>
-    <string name="copy_nutrient_title">Press for copy</string>
+    <string name="info">Info</string>
+    <string name="copy_nutrient_title">Tap to copy</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="add_ingredient">Add ingredient</string>
@@ -22,6 +23,38 @@
     <string name="delete_dish">Do you want delete this dish?</string>
     <string name="edit_dish">Edit this dish</string>">
     <string name="rec_calories">Recommended calories:</string>">
-    <string name="comment_calc_calories">* 1 gram of fat contains 9 kcal 1 gram of protein contains 4 kcal, and 1 gram of carbohydrates contains 4 kcal.</string>">
-
+    <string name="comment_calc_calories">*1 gram of fat - 9 kcal,\n  1 gram of protein - 4 kcal,\n  1 gram of carbohydrates - 4 kcal</string>
+    <string name="char_limit_exceeded">Character limit exceeded (maximum </string>
+    <string name="text_counted_calorie">Estimated calories</string>
+    <string name="use_calories">Use</string>
+    <string name="add">Add</string>
+    <string name="calculate">Calculate</string>
+    <string name="all_weight">All weight, gram</string>
+    <string name="weight_not_correct">Weight not correct</string>
+    <string name="calculations">Calculations for your dish</string>
+    <string name="no_saved_dishes">No saved dishes</string>
+    <string name="start_add_ingredients_to_dish">Start to adding ingredients for dish</string>
+    <string name="hello_info">Hello chefs!</string>
+    <string name="text_for_info_1">You can add ingredients and calculate your dish</string>
+    <string name="text_for_info_2">It\'s very useful if you cooking</string>
+    <string name="text_for_info_3">home food and trying to calculate calories</string>
+    <string name="text_for_info_4">I hope you will enjoy my app</string>
+    <string name="text_for_info_5">If you have any questions or suggestions,</string>
+    <string name="text_for_info_6">please contact me</string>
+    <string name="send_email">Send me an email</string>
+    <string name="rate_app">Rate the App</string>
+    <string name="share_app">Share me, please!</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="terms_and_conditions">Terms &amp; Conditions</string>
+    <string name="like_app_title">Do you like Cook&amp;Calc?</string>
+    <string name="like_app_subtitle_1">We\'re doing our best to improve your experience.</string>
+    <string name="like_app_subtitle_2"> We\'d really appreciate it if you could rate us!</string>
+    <string name="rate_star_1">First Star</string>
+    <string name="rate_star_2">Second Star</string>
+    <string name="rate_star_3">Third Star</string>
+    <string name="rate_star_4">Fourth Star</string>
+    <string name="rate_star_5">Fifth Star</string>
+    <string name="rate_us">Rate us!</string>
+    <string name="try_app">Try the app</string>
+    <string name="share_app_title">Share Cook&amp;Calc</string>>
 </resources>

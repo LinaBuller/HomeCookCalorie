@@ -1,6 +1,7 @@
 [versions]
 accompanist-insets-ui = "0.28.0"
 accompanist-svg = "0.21.0"
+accompanist-systemuicontroller = "0.34.0"
 agp = "8.8.0"
 androidsvg-constraintlayout = "1.2.1"
 bson = "4.11.0"
@@ -17,21 +18,25 @@ kotlinx-coroutines-core = "1.7.0"
 kotlinx-serialization-json = "1.6.3"
 library-base = "1.13.0"
 lifecycle-runtime-ktx = "2.8.7"
-activity-compose = "1.10.0"
-compose-bom = "2025.01.01"
-material = "1.7.7"
+activity-compose = "1.10.1"
+compose-bom = "2025.03.00"
+material = "1.7.8"
 mockito-core = "4.8.1"
-navigation-compose = "2.8.6"
+navigation-compose = "2.8.9"
 realm-android-library = "10.19.0"
 realm-realm-android-library = "1.16.0"
 room-ktx = "2.6.1"
-ui = "1.7.7"
+ui = "1.7.8"
 work-runtime-ktx = "2.10.0"
 google-material = "1.12.0"
 junit-jupiter = "5.8.1"
+ui-test-android = "1.7.8"
+compose-testing = "1.0.0-alpha03"
+ui-tooling = "1.7.8"
 
 [libraries]
 accompanist-insets-ui = { module = "com.google.accompanist:accompanist-insets-ui", version.ref = "accompanist-insets-ui" }
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist-systemuicontroller" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-work" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt-work" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
@@ -60,6 +65,9 @@ ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 material3 = { group = "androidx.compose.material3", name = "material3" }
 material = { group = "com.google.android.material", name = "material", version.ref = "google-material" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit-jupiter" }
+androidx-ui-test-android = { group = "androidx.compose.ui", name = "ui-test-android", version.ref = "ui-test-android" }
+androidx-compose-testing = { group = "androidx.xr.compose", name = "compose-testing", version.ref = "compose-testing" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "ui-tooling" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

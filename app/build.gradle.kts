@@ -1,3 +1,5 @@
+import java.util.Properties
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
@@ -9,6 +11,9 @@ plugins {
     id("kotlinx-serialization")
 }
 
+val keystoreProperties = Properties().apply {
+    load(File(rootDir, "keystore.properties").inputStream())
+}
 android {
     namespace = "com.buller.ckkal"
     compileSdk = 35
@@ -17,8 +22,8 @@ android {
         applicationId = "com.buller.ckkal"
         minSdk = 28
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,8 +31,18 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(keystoreProperties["RELEASE_STORE_FILE"] as String)
+            storePassword = keystoreProperties["RELEASE_STORE_PASSWORD"] as String
+            keyAlias = keystoreProperties["RELEASE_KEY_ALIAS"] as String
+            keyPassword = keystoreProperties["RELEASE_KEY_PASSWORD"] as String
+        }
+    }
+
     buildTypes {
-        release {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -35,6 +50,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -69,20 +85,15 @@ dependencies {
     implementation (libs.androidx.ui)
     implementation (libs.androidx.navigation.compose)
     implementation(libs.material)
-    testImplementation(libs.junit)
-    testImplementation(libs.junit.jupiter)
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    implementation(libs.androidx.ui.test.android)
     androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.ui.test.junit4)
     testImplementation (libs.mockito.core)
-    debugImplementation(libs.ui.tooling)
-    debugImplementation(libs.ui.test.manifest)
     implementation(libs.accompanist.insets.ui)
     implementation(libs.kotlinx.serialization.json)
-
+    implementation(libs.accompanist.systemuicontroller)
     //dagger
     implementation (libs.hilt.android)
+    debugImplementation(libs.androidx.ui.tooling)
     kapt ("com.google.dagger:hilt-compiler:2.51.1")
     implementation (libs.androidx.hilt.work)
     implementation (libs.androidx.work.runtime.ktx)

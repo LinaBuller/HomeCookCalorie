@@ -7,5 +7,5 @@ data class DishState(
     val finalFats: Double = 0.0,
     val finalCarbs: Double = 0.0,
     val totalWeight: Double = 0.0,
-    val name:String = "Something dish"
+    val name:String = ""
 )

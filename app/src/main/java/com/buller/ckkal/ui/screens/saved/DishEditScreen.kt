@@ -1,29 +1,29 @@
 package com.buller.ckkal.ui.screens.saved
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -31,22 +31,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.buller.ckkal.R
 import com.buller.ckkal.domain.entities.Dish
 import com.buller.ckkal.domain.entities.Ingredient
-import com.buller.ckkal.ui.screens.CustomOutlinedTextField
-import com.buller.ckkal.ui.screens.DeleteDialog
-import com.buller.ckkal.ui.screens.home.AddIngredientBottomSheetDialog
-import com.buller.ckkal.ui.screens.home.EditIngredientDialog
-import com.buller.ckkal.ui.screens.home.ListOfIngredient
-import com.buller.ckkal.ui.screens.saved.roller.NumericRoller
+import com.buller.ckkal.ui.screens.DualButtonPanel
+import com.buller.ckkal.ui.screens.LEFT_BUTTON
+import com.buller.ckkal.ui.screens.RIGHT_BUTTON
+import com.buller.ckkal.ui.screens.home.IngredientList
+import com.buller.ckkal.ui.screens.roller.NumericRoller
+import com.buller.ckkal.ui.screens.saved.dialogs.SavedDishesDialogState
 import com.buller.ckkal.ui.screens.states.DishState
 import com.buller.ckkal.ui.screens.states.IngredientsState
+
 
 @Composable
 fun DishEditScreenRoute(
@@ -55,36 +58,22 @@ fun DishEditScreenRoute(
     dishEditViewModel: DishEditViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
-    LaunchedEffect(dish) {
+    SideEffect {
         dishEditViewModel.initDish(dish)
-    }
-
-    val onSaveDish = {
-        dishEditViewModel.updateOldDish()
-    }
-
-    val onDeleteIngredient = { ingredient: Ingredient ->
-        dishEditViewModel.removeIngredient(ingredient)
-        dishEditViewModel.calculateCurrentDish()
-    }
-
-    val onEditIngredient = { ingredient: Ingredient ->
-        dishEditViewModel.editIngredient(ingredient)
-        dishEditViewModel.calculateCurrentDish()
-    }
-    val onSetWeight = { weight: Double ->
-        if (weight > 0) {
-            dishEditViewModel.setWeight(weight)
-            dishEditViewModel.calculateCurrentDish()
-        }
     }
 
     DishEditScreen(
         modifier = modifier,
-        onSetWeight = onSetWeight,
-        onSaveDish = onSaveDish,
-        onDeleteIngredient = onDeleteIngredient,
-        onEditIngredient = onEditIngredient,
+        dishEditViewModel = dishEditViewModel,
+
+        onWeightSet = dishEditViewModel::setWeight,
+        onSaveDish = {
+            dishEditViewModel.updateOldDish()
+            onBack()
+        },
+        onDeleteIngredient = dishEditViewModel::deleteIngredient,
+        onEditIngredient = dishEditViewModel::editIngredient,
+        onAddIngredient = dishEditViewModel::setIngredient,
         onBack = onBack
     )
 }
@@ -92,150 +81,102 @@ fun DishEditScreenRoute(
 @Composable
 fun DishEditScreen(
     modifier: Modifier = Modifier,
-    dishEditViewModel: DishEditViewModel = hiltViewModel(),
-    onSetWeight: (Double) -> Unit,
-    onBack: () -> Unit,
+    dishEditViewModel: DishEditViewModel,
+    onWeightSet: (Double) -> Unit,
     onSaveDish: () -> Unit,
     onDeleteIngredient: (Ingredient) -> Unit,
-    onEditIngredient: (Ingredient) -> Unit
+    onEditIngredient: (Ingredient) -> Unit,
+    onAddIngredient: (Ingredient) -> Unit,
+    onBack: () -> Unit,
 ) {
-    var isDeleteIngredientDialogOpen by remember { mutableStateOf(false) }
-    var ingredientToDelete by remember { mutableStateOf<Ingredient?>(null) }
-
-    var isEditIngredientDialogOpen by remember { mutableStateOf(false) }
-    var ingredientToEdit by remember { mutableStateOf<Ingredient?>(null) }
-
     val ingredientsState = dishEditViewModel.ingredientsState.collectAsState()
     val dishState = dishEditViewModel.dish.collectAsState()
+    var dialogState by remember { mutableStateOf<SavedDishesDialogState>(SavedDishesDialogState.Closed) }
 
-    var isAddIngredientDialogOpen by remember { mutableStateOf(false) }
+    EditDishView(
+        modifier = modifier,
+        dishState = dishState.value,
+        ingredientsState = ingredientsState.value,
+        onBack = onBack,
+        dialogState = { dialogState = it },
+        onSaveDish = onSaveDish
+    )
 
-    val setIngredient = { ingredient: Ingredient ->
-        dishEditViewModel.setIngredient(ingredient)
-        dishEditViewModel.calculateCurrentDish()
-    }
+    SavedDishesDialogManager(
+        dialogState = dialogState,
+        onAddIngredient = onAddIngredient,
+        onEditIngredient = onEditIngredient,
+        onWeightSet = onWeightSet,
+        onDismissRequest = { dialogState = SavedDishesDialogState.Closed },
+        onDeleteIngredient = onDeleteIngredient
+    )
+}
 
-    Column(modifier = modifier.fillMaxSize()) {
-        Row(
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = stringResource(R.string.cancel)
-                )
-            }
-            Text(text = stringResource(R.string.edit_dish), modifier = Modifier.weight(1f))
-            IconButton(onClick = { isAddIngredientDialogOpen = true }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_ingredient)
-                )
-            }
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditDishView(
+    modifier: Modifier = Modifier,
+    dishState: DishState,
+    ingredientsState: IngredientsState,
+    onBack: () -> Unit,
+    dialogState: (SavedDishesDialogState) -> Unit,
+    onSaveDish: () -> Unit
+) {
+
+    Scaffold(
+        topBar = {
+            EditTopBar(
+                onBack = onBack,
+                onAddIngredient = {
+                    dialogState(SavedDishesDialogState.AddIngredient)
+                })
         }
+    ) { paddingValues ->
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        DishPart(state = dishState.value, setWeight = { weight ->
-            if (weight != null) {
-                onSetWeight(weight)
-            }
-        })
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        ListOfIngredient(modifier = Modifier
-            .weight(1f)
-            .fillMaxWidth(),
-            ingredients = ingredientsState.value.ingredients,
-            onRemoveIngredient = { ingredient ->
-                isDeleteIngredientDialogOpen = true
-                ingredientToDelete = ingredient
-            },
-            onEditIngredient = { ingredient ->
-                isEditIngredientDialogOpen = true
-                ingredientToEdit = ingredient
-            })
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-                .height(60.dp)
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            Button(
-                onClick = onBack,
+            DishPart(
+                state = dishState,
+                showChangeWeight = { weight ->
+                    dialogState(SavedDishesDialogState.EditWeight(weight))
+                })
+
+
+            IngredientList(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 8.dp),
-                contentPadding = PaddingValues(16.dp)
-            ) {
-                Icon(
-                    modifier = Modifier.padding(end = 8.dp),
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.cancel),
-                    tint = LocalContentColor.current
-                )
-                Text(text = stringResource(R.string.cancel))
-            }
-            Button(
-                onClick = { onSaveDish() },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp),
-                contentPadding = PaddingValues(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary, contentColor = Color.White
-                )
-            ) {
-                Icon(
-                    modifier = Modifier.padding(end = 8.dp),
-                    imageVector = Icons.Default.Done,
-                    contentDescription = stringResource(R.string.save),
-                    tint = LocalContentColor.current
-                )
-                Text(text = stringResource(R.string.save))
+                    .fillMaxWidth(),
+                listOfIngredients = ingredientsState.ingredients,
+                onDeleteIngredient = { ingredient ->
+                    dialogState(SavedDishesDialogState.DeleteIngredient(ingredient))
+                },
+                onEditIngredient = { ingredient ->
+                    dialogState(SavedDishesDialogState.EditIngredient(ingredient))
+                })
+
+            DualButtonPanel(
+                leftButtonIcon = Icons.Default.Close,
+                leftButtonText = R.string.cancel,
+                rightButtonIcon = Icons.Default.Done,
+                rightButtonText = R.string.save
+            ) { buttonType ->
+                when (buttonType) {
+                    LEFT_BUTTON -> onBack()
+                    RIGHT_BUTTON -> onSaveDish()
+                }
             }
         }
-    }
-    if (isDeleteIngredientDialogOpen && ingredientToDelete != null) {
-        DeleteDialog(item = ingredientToDelete!!,
-            confirmationText = stringResource(R.string.delete),
-            title = stringResource(R.string.delete_ingredient),
-            onConfirm = { ingredient ->
-                onDeleteIngredient(ingredient)
-                isDeleteIngredientDialogOpen = false
-                ingredientToDelete = null
-            },
-            onDismiss = {
-                isDeleteIngredientDialogOpen = false
-            })
-    }
-
-    if (isEditIngredientDialogOpen && ingredientToEdit != null) {
-        EditIngredientDialog(ingredient = ingredientToEdit!!, onSave = { editedIngredient ->
-            onEditIngredient(editedIngredient)
-            isEditIngredientDialogOpen = false
-            ingredientToEdit = null
-        }, onDismiss = {
-            isEditIngredientDialogOpen = false
-        })
-    }
-
-    if (isAddIngredientDialogOpen) {
-        AddIngredientBottomSheetDialog(
-            onDismiss = { isAddIngredientDialogOpen = false },
-            onAddIngredient = { ingredient ->
-                setIngredient(ingredient)
-                isAddIngredientDialogOpen = false
-            })
     }
 }
 
 @Composable
-fun DishPart(state: DishState, setWeight: (Double?) -> Unit = {}) {
-
+fun DishPart(
+    state: DishState,
+    showChangeWeight: (Double) -> Unit,
+) {
     var weight by remember { mutableStateOf(state.totalWeight.toString()) }
 
     LaunchedEffect(state.totalWeight) {
@@ -244,61 +185,116 @@ fun DishPart(state: DishState, setWeight: (Double?) -> Unit = {}) {
 
     Card(
         modifier = Modifier
-            .padding(5.dp)
+            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
             .fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
+        shape = MaterialTheme.shapes.medium,
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
             modifier = Modifier
-                .background(Color.LightGray)
-                .padding(8.dp)
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(16.dp)
         ) {
-            Text(text = state.name)
-            Spacer(modifier = Modifier.padding(8.dp))
+            Text(
+                text = state.name, style = MaterialTheme.typography.titleLarge, fontSize = 26.sp
+            )
+            Spacer(modifier = Modifier.padding(16.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier
-                    .padding(5.dp)
-                    .fillMaxWidth()
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = stringResource(R.string.kkal))
-                    NumericRoller(number = state.finalKcal)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = stringResource(R.string.fats))
-                    NumericRoller(number = state.finalFats)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = stringResource(R.string.carbs))
-                    NumericRoller(number = state.finalCarbs)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = stringResource(R.string.proteins))
-                    NumericRoller(number = state.finalProteins)
-                }
+                LabeledRollerValue(value = state.finalKcal, label = R.string.kkal)
+                LabeledRollerValue(value = state.finalFats, label = R.string.fats)
+                LabeledRollerValue(value = state.finalCarbs, label = R.string.carbs)
+                LabeledRollerValue(value = state.finalProteins, label = R.string.proteins)
             }
             Spacer(modifier = Modifier.padding(8.dp))
-            CustomOutlinedTextField(value = weight, onValueChange = {
-                if (it.isEmpty()) {
-                    weight = it
-                    setWeight(null)
-                } else {
-                    val newWeight = it.toDoubleOrNull()
-                    if (newWeight != null && newWeight >= 0) {
-                        weight = it
-                        setWeight(newWeight)
-                    }
-                }
-            }, label = stringResource(R.string.weight), isNumeric = true,
-                maxLength = 6,
-                onShowError = {
-
-                }, onNext = {})
+            WeightValue(weight = weight, showChangeWeight = showChangeWeight)
         }
+    }
+}
+
+@Composable
+fun WeightValue(modifier: Modifier = Modifier, weight: String, showChangeWeight: (Double) -> Unit) {
+    val clipboardManager = LocalClipboardManager.current
+    Column(horizontalAlignment = Alignment.Start) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                modifier = Modifier.clickable {
+                    clipboardManager.setText(AnnotatedString(weight))
+                },
+                text = weight,
+                style = MaterialTheme.typography.bodyMedium,
+                fontSize = 30.sp
+            )
+            IconButton(onClick = {
+                showChangeWeight(weight.toDouble())
+            }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = stringResource(R.string.weight)
+                )
+            }
+        }
+        Text(
+            text = stringResource(R.string.weight),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditTopBar(
+    onBack: () -> Unit, onAddIngredient: () -> Unit
+) {
+
+    CenterAlignedTopAppBar(title = {
+        Text(
+            text = stringResource(R.string.edit_dish),
+            fontSize = 20.sp,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }, navigationIcon = {
+        IconButton(onClick = onBack) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                contentDescription = stringResource(R.string.cancel)
+            )
+        }
+    }, actions = {
+        FilledIconButton(onClick = onAddIngredient) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = stringResource(R.string.cancel)
+            )
+        }
+    })
+}
+
+@Composable
+fun LabeledRollerValue(
+    value: Double,
+    @StringRes label: Int
+) {
+    val clipboardManager = LocalClipboardManager.current
+    Column(horizontalAlignment = Alignment.Start) {
+        NumericRoller(number = value, modifier = Modifier.clickable {
+            clipboardManager.setText(AnnotatedString("$value"))
+        })
+        Spacer(modifier = Modifier.padding(4.dp))
+        Text(
+            modifier = Modifier.clickable {
+                clipboardManager.setText(AnnotatedString("$value"))
+            },
+            text = stringResource(label),
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
@@ -307,7 +303,7 @@ fun DishPart(state: DishState, setWeight: (Double?) -> Unit = {}) {
 fun DishEditScreenPreview() {
     val ingredients = listOf(
         Ingredient(
-            ingredientId = "1",
+            id = "1",
             name = "Ingredient 1",
             fats = 123.9,
             kcal = 2.5,
@@ -316,7 +312,7 @@ fun DishEditScreenPreview() {
             weight = 234.4,
             dishId = "1"
         ), Ingredient(
-            ingredientId = "2",
+            id = "2",
             name = "Ingredient 2",
             fats = 123.9,
             kcal = 2.5,
@@ -325,7 +321,7 @@ fun DishEditScreenPreview() {
             weight = 234.4,
             dishId = "2"
         ), Ingredient(
-            ingredientId = "3",
+            id = "3",
             name = "Ingredient 3",
             fats = 123.9,
             kcal = 2.5,
@@ -344,13 +340,11 @@ fun DishEditScreenPreview() {
         finalProteins = 0.0,
         finalCarbs = 0.0
     )
-//    DishEditScreen(
-//        ingredientsState = ingredientsState,
-//        dishState = dishState,
-//        onEditIngredient = {},
-//        onSetWeight = { 0.0 },
-//        onSaveDish = {},
-//        onBack = {},
-//        onDeleteIngredient = {}
-//    )
+
+    EditDishView(
+        ingredientsState = ingredientsState,
+        dishState = dishState,
+        onBack = {},
+        onSaveDish = {},
+        dialogState = {})
 }

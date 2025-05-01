@@ -1,0 +1,120 @@
+package com.buller.ckkal.ui.screens.home.dialogs
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.buller.ckkal.R
+import com.buller.ckkal.ui.screens.CustomOutlinedTextField
+import com.buller.ckkal.ui.screens.home.views.NutrientPart
+import com.buller.ckkal.ui.screens.states.DishState
+
+@Composable
+fun CalculationDialog(
+    state: DishState,
+    onSaveDishes: (String) -> Unit,
+    onDismiss: () -> Unit = {}
+) {
+    var dishName by remember { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(dismissOnClickOutside = false)
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            ) {
+                NutrientPart(state = state)
+                Spacer(modifier = Modifier.height(16.dp))
+                CustomOutlinedTextField(value = dishName,
+                    onValueChange = { dishName = it },
+                    label = stringResource(R.string.dish_name),
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLength = 40,
+                    onNext = {
+
+                        //TODO don't work hide
+                        keyboardController?.hide()
+                    })
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(horizontalArrangement = Arrangement.SpaceBetween)
+                {
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        contentPadding = PaddingValues(12.dp)
+                    ) {
+                        Icon(
+                            modifier = Modifier.padding(end = 8.dp),
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                            tint = LocalContentColor.current
+                        )
+                        Text(text = stringResource(R.string.delete))
+                    }
+                    Button(
+                        onClick = { onSaveDishes(dishName) },
+                        modifier = Modifier.weight(1f),
+                        shape = MaterialTheme.shapes.medium,
+                        contentPadding = PaddingValues(12.dp)
+                    ) {
+                        Icon(
+                            modifier = Modifier.padding(end = 8.dp),
+                            imageVector = Icons.Rounded.Done,
+                            contentDescription = stringResource(R.string.save),
+                            tint = LocalContentColor.current
+                        )
+                        Text(text = stringResource(R.string.save))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CalculationScreenPreview() {
+    val dish = DishState(
+        finalProteins = 1.0,
+        finalKcal = 1.0,
+        finalFats = 1.0,
+        finalCarbs = 1.0,
+    )
+    val state = remember { dish }
+    CalculationDialog(onSaveDishes = {}, state = state)
+}

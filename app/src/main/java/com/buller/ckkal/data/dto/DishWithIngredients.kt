@@ -14,7 +14,7 @@ data class DishWithIngredients(
 ) {
     fun toDish(): Dish {
         return Dish(
-            itemId = dish.id,
+            id = dish.id,
             name = dish.name,
             allKcal = dish.allKcal,
             allFats = dish.allFats,

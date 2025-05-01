@@ -30,7 +30,7 @@ class DishEditViewModel
     fun initDish(dish: Dish) {
         _dish.update {
             it.copy(
-                id = dish.itemId,
+                id = dish.id,
                 name = dish.name,
                 finalFats = dish.allFats,
                 finalProteins = dish.allProteins,
@@ -46,7 +46,7 @@ class DishEditViewModel
 
     fun updateOldDish() {
         val dish = Dish(
-            itemId = _dish.value.id,
+            id = _dish.value.id,
             ingredients = _ingredientsState.value.ingredients,
             name = _dish.value.name,
             allWeight = _dish.value.totalWeight,
@@ -83,6 +83,7 @@ class DishEditViewModel
         _dish.update {
             it.copy(totalWeight = weight)
         }
+        calculateCurrentDish()
     }
 
     private fun updateDish(dish: Dish) {
@@ -95,18 +96,20 @@ class DishEditViewModel
         _ingredientsState.update {
             it.copy(ingredients = it.ingredients + ingredient)
         }
+        calculateCurrentDish()
     }
 
-    fun removeIngredient(ingredient: Ingredient) {
+    fun deleteIngredient(ingredient: Ingredient) {
         _ingredientsState.update {
             it.copy(ingredients = it.ingredients - ingredient)
         }
+        calculateCurrentDish()
     }
 
     fun editIngredient(ingredient: Ingredient) {
         _ingredientsState.update { currentState ->
             val updatedIngredients = currentState.ingredients.map { currentIngredient ->
-                if (currentIngredient.ingredientId == ingredient.ingredientId) {
+                if (currentIngredient.id == ingredient.id) {
                     ingredient
                 } else {
                     currentIngredient

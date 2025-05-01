@@ -6,7 +6,7 @@ import java.util.UUID
 
 @Serializable
 data class Ingredient(
-    var ingredientId: String = UUID.randomUUID().toString(),
+    var id: String = UUID.randomUUID().toString(),
     var dishId: String = "",
     var name: String? = null,
     var kcal: Double = 0.0,
@@ -17,7 +17,7 @@ data class Ingredient(
 ) {
     fun toIngredientDto(): IngredientDto {
         return IngredientDto(
-            ingredientId = ingredientId,
+            ingredientId = id,
             name = name,
             kcal = kcal,
             fats = fats,

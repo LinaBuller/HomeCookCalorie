@@ -55,10 +55,8 @@ class SharedViewModel @Inject constructor(
     fun calculateCurrentDish() {
         val nutrients = MathUtil.calculateNutrient(
             dishWeight = _dish.value.totalWeight,
-            ingredientsState = _ingredientsState.value,
-
-
-            )
+            ingredientsState = _ingredientsState.value
+        )
         _dish.update {
             it.copy(
                 finalKcal = nutrients.finalKcal,
@@ -102,7 +100,6 @@ class SharedViewModel @Inject constructor(
     }
 
     private fun setDish(dish: Dish) {
-        Log.d("MyLog", "Saving dish to database")
         viewModelScope.launch {
             setDishUseCase.execute(dish)
         }
@@ -126,19 +123,20 @@ class SharedViewModel @Inject constructor(
 
     fun saveDish() {
         val dish = Dish(
-            itemId = UUID.randomUUID().toString(),
+            id = UUID.randomUUID().toString(),
             ingredients = _ingredientsState.value.ingredients,
             allKcal = _dish.value.finalKcal,
             allFats = _dish.value.finalFats,
             allCarbs = _dish.value.finalCarbs,
             allProteins = _dish.value.finalProteins,
             allWeight = _dish.value.totalWeight,
-            name = _dish.value.name
+            name = _dish.value.name.ifBlank { "Some dish" }
         )
         setDish(dish)
+        cleanDishWithIngredientsList()
     }
 
-    fun cleanDish() {
+    private fun cleanDishWithIngredientsList() {
         _dish.value = _dish.value.copy(
             finalCarbs = 0.0,
             finalFats = 0.0,
@@ -158,7 +156,7 @@ class SharedViewModel @Inject constructor(
     fun editIngredient(ingredient: Ingredient) {
         _ingredientsState.update { currentState ->
             val updatedIngredients = currentState.ingredients.map { currentIngredient ->
-                if (currentIngredient.ingredientId == ingredient.ingredientId) {
+                if (currentIngredient.id == ingredient.id) {
                     ingredient
                 } else {
                     currentIngredient
@@ -166,5 +164,10 @@ class SharedViewModel @Inject constructor(
             }
             currentState.copy(ingredients = updatedIngredients)
         }
+    }
+
+    fun setDishName(name: String) {
+        if (name.isNullOrBlank()) return
+        _dish.update { it.copy(name = name) }
     }
 }

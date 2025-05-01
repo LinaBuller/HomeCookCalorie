@@ -27,7 +27,7 @@ data class IngredientDto(
 ) {
     fun toIngredient(): Ingredient {
         return Ingredient(
-            ingredientId = ingredientId,
+            id = ingredientId,
             name = name,
             kcal = kcal,
             fats = fats,
