@@ -1,6 +1,9 @@
 package com.buller.ckkal.ui.screens
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.buller.ckkal.domain.utils.Result
@@ -29,6 +32,7 @@ class SharedViewModel @Inject constructor(
     private val setDishUseCase: SetDishUseCase,
     private val updateDishUseCase: UpdateDishUseCase
 ) : ViewModel() {
+
     private val _ingredientsState = MutableStateFlow(IngredientsState(ingredients = emptyList()))
     val ingredientsState: StateFlow<IngredientsState> = _ingredientsState
     private val _dish = MutableStateFlow(DishState())
@@ -36,6 +40,7 @@ class SharedViewModel @Inject constructor(
     private val _savedDishesState = MutableStateFlow(DishesState(dishes = emptyList()))
     val savedDishesState: StateFlow<DishesState> = _savedDishesState
 
+    var selectedDish by mutableStateOf<Dish?>(null)
 
     init {
         getDishes()
@@ -46,7 +51,7 @@ class SharedViewModel @Inject constructor(
             _ingredientsState.value.copy(ingredients = _ingredientsState.value.ingredients + ingredient)
     }
 
-    fun setWeight(weight: Double) {
+    fun setTotalWeight(weight: Double) {
         _dish.update {
             it.copy(totalWeight = weight)
         }
@@ -105,9 +110,9 @@ class SharedViewModel @Inject constructor(
         }
     }
 
-    fun updateDish(dish: Dish) {
+    fun updateDish() {
         viewModelScope.launch {
-            updateDishUseCase.execute(dish)
+            updateDishUseCase.execute(selectedDish!!)
         }
     }
 
@@ -130,7 +135,8 @@ class SharedViewModel @Inject constructor(
             allCarbs = _dish.value.finalCarbs,
             allProteins = _dish.value.finalProteins,
             allWeight = _dish.value.totalWeight,
-            name = _dish.value.name.ifBlank { "Some dish" }
+            name = _dish.value.name.ifBlank { "Some dish" },
+            createdAt = System.currentTimeMillis().toString()
         )
         setDish(dish)
         cleanDishWithIngredientsList()
@@ -167,7 +173,7 @@ class SharedViewModel @Inject constructor(
     }
 
     fun setDishName(name: String) {
-        if (name.isNullOrBlank()) return
+        if (name.isBlank()) return
         _dish.update { it.copy(name = name) }
     }
 }

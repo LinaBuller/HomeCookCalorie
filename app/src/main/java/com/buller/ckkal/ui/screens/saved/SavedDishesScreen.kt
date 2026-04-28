@@ -26,7 +26,7 @@ import com.buller.ckkal.ui.screens.DeleteDialog
 import com.buller.ckkal.ui.screens.SharedViewModel
 import com.buller.ckkal.ui.screens.states.DishesState
 import com.buller.ckkal.R
-import com.buller.ckkal.ui.screens.DataOrPlaceholder
+import com.buller.ckkal.ui.screens.views.DataOrPlaceholder
 
 @Composable
 fun SavedDishesRoute(
@@ -75,7 +75,7 @@ fun SavedDishesScreen(
             isNotEmpty = dishes.isNotEmpty()
         ) {
             ListOfDishes(
-                modifier = modifier.weight(1f),
+                modifier = modifier.weight(1f).padding(top = 16.dp),
                 dishes = dishes,
                 state = listState,
                 onRemoveDish = {

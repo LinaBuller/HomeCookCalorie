@@ -73,7 +73,7 @@ fun DigitRoller(
             Text(
                 text = character,
                 style = MaterialTheme.typography.bodyMedium,
-                fontSize = 26.sp,
+                fontSize = 22.sp,
                 modifier = Modifier.padding(1.dp)
             )
         }

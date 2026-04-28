@@ -21,6 +21,7 @@ data class DishWithIngredients(
             allCarbs = dish.allCarbs,
             allProteins = dish.allProteins,
             allWeight = dish.allWeight,
+            createdAt = dish.createdAt,
             ingredients = ingredients.map { it.toIngredient() }
         )
     }

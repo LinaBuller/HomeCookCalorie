@@ -25,7 +25,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.window.Dialog
-import com.buller.ckkal.ui.screens.CustomOutlinedTextField
+import com.buller.ckkal.ui.screens.views.CustomOutlinedTextField
 import com.buller.ckkal.ui.screens.states.NutrientEditState
 import com.buller.ckkal.ui.screens.states.OnNutrientChange
 
@@ -224,7 +224,8 @@ fun EditIngredientDialogPreview() {
         kcal = 2.5,
         carbs = 2.3,
         proteins = 4.5,
-        weight = 234.4
+        weight = 234.4,
+        dishId = ""
     )
     EditIngredientDialog(ingredient = ingredient, onSave = {}, onDismiss = {})
 }

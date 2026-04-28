@@ -1,6 +1,7 @@
 package com.buller.ckkal.di
 
 import android.content.Context
+import androidx.room.migration.Migration
 import com.buller.ckkal.data.repositories.LocalDatabaseRepositoryImpl
 import com.buller.ckkal.data.room.DishDao
 import com.buller.ckkal.data.room.LocalDatabase
@@ -59,4 +60,9 @@ object DataModule {
     @Singleton
     fun provideUpdateDishUseCase(repository: LocalDatabaseRepository): UpdateDishUseCase =
         UpdateDishUseCase(repository = repository)
+
+    @Provides
+    fun provideMigrations(): Array<Migration>{
+        return arrayOf()
+    }
 }

@@ -1,6 +1,5 @@
 package com.buller.ckkal.ui.screens.home.views
 
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,12 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.buller.ckkal.R
 import com.buller.ckkal.domain.entities.Ingredient
-import com.buller.ckkal.ui.screens.LabeledValue
+import com.buller.ckkal.ui.screens.views.LabeledValue
 
 @Composable
 fun CollapsibleCard(

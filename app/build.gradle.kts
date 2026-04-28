@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import java.util.Properties
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
@@ -6,9 +7,10 @@ plugins {
     alias(libs.plugins.kotlinAndroid)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
-    id("io.realm.kotlin")
     id("kotlin-parcelize")
     id("kotlinx-serialization")
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
+
 }
 
 val keystoreProperties = Properties().apply {
@@ -22,12 +24,17 @@ android {
         applicationId = "com.buller.ckkal"
         minSdk = 28
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.0"
+        versionCode = 3
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments(mapOf("room.schemaLocation" to "$projectDir/schemas"))
+            }
         }
     }
 
@@ -43,11 +50,14 @@ android {
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            ndk {
+                debugSymbolLevel = "FULL"
+            }
         }
     }
 
@@ -58,15 +68,23 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    kapt {
+        correctErrorTypes = true
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 }
@@ -91,6 +109,8 @@ dependencies {
     implementation(libs.accompanist.insets.ui)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.accompanist.systemuicontroller)
+
+
     //dagger
     implementation (libs.hilt.android)
     debugImplementation(libs.androidx.ui.tooling)
@@ -101,6 +121,7 @@ dependencies {
 
     //Room
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
     kapt(libs.androidx.room.room.compiler)
 }

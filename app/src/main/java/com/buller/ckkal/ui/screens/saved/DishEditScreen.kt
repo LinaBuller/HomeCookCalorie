@@ -1,7 +1,6 @@
 package com.buller.ckkal.ui.screens.saved
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,21 +8,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -37,13 +32,12 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.buller.ckkal.R
-import com.buller.ckkal.domain.entities.Dish
 import com.buller.ckkal.domain.entities.Ingredient
-import com.buller.ckkal.ui.screens.DualButtonPanel
-import com.buller.ckkal.ui.screens.LEFT_BUTTON
-import com.buller.ckkal.ui.screens.RIGHT_BUTTON
+import com.buller.ckkal.ui.screens.views.DualButtonPanel
+import com.buller.ckkal.ui.screens.views.LEFT_BUTTON
+import com.buller.ckkal.ui.screens.views.RIGHT_BUTTON
 import com.buller.ckkal.ui.screens.home.IngredientList
 import com.buller.ckkal.ui.screens.roller.NumericRoller
 import com.buller.ckkal.ui.screens.saved.dialogs.SavedDishesDialogState
@@ -54,18 +48,13 @@ import com.buller.ckkal.ui.screens.states.IngredientsState
 @Composable
 fun DishEditScreenRoute(
     modifier: Modifier = Modifier,
-    dish: Dish,
-    dishEditViewModel: DishEditViewModel = hiltViewModel(),
+    dishEditViewModel: DishEditViewModel,
+    navigateToAddTotalWeightScreen: (Double) -> Unit,
     onBack: () -> Unit
 ) {
-    SideEffect {
-        dishEditViewModel.initDish(dish)
-    }
-
     DishEditScreen(
         modifier = modifier,
         dishEditViewModel = dishEditViewModel,
-
         onWeightSet = dishEditViewModel::setWeight,
         onSaveDish = {
             dishEditViewModel.updateOldDish()
@@ -73,7 +62,9 @@ fun DishEditScreenRoute(
         },
         onDeleteIngredient = dishEditViewModel::deleteIngredient,
         onEditIngredient = dishEditViewModel::editIngredient,
-        onAddIngredient = dishEditViewModel::setIngredient,
+        navigateToAddTotalWeightScreen = {
+            navigateToAddTotalWeightScreen.invoke(dishEditViewModel.dish.value.totalWeight)
+        },
         onBack = onBack
     )
 }
@@ -86,11 +77,12 @@ fun DishEditScreen(
     onSaveDish: () -> Unit,
     onDeleteIngredient: (Ingredient) -> Unit,
     onEditIngredient: (Ingredient) -> Unit,
-    onAddIngredient: (Ingredient) -> Unit,
+    navigateToAddTotalWeightScreen: () -> Unit,
     onBack: () -> Unit,
 ) {
-    val ingredientsState = dishEditViewModel.ingredientsState.collectAsState()
-    val dishState = dishEditViewModel.dish.collectAsState()
+    val ingredientsState = dishEditViewModel.ingredientsState.collectAsStateWithLifecycle()
+    val dishState = dishEditViewModel.dish.collectAsStateWithLifecycle()
+
     var dialogState by remember { mutableStateOf<SavedDishesDialogState>(SavedDishesDialogState.Closed) }
 
     EditDishView(
@@ -99,12 +91,12 @@ fun DishEditScreen(
         ingredientsState = ingredientsState.value,
         onBack = onBack,
         dialogState = { dialogState = it },
-        onSaveDish = onSaveDish
+        onSaveDish = onSaveDish,
+        navigateToAddTotalWeightScreen = navigateToAddTotalWeightScreen
     )
 
     SavedDishesDialogManager(
         dialogState = dialogState,
-        onAddIngredient = onAddIngredient,
         onEditIngredient = onEditIngredient,
         onWeightSet = onWeightSet,
         onDismissRequest = { dialogState = SavedDishesDialogState.Closed },
@@ -118,55 +110,42 @@ fun EditDishView(
     modifier: Modifier = Modifier,
     dishState: DishState,
     ingredientsState: IngredientsState,
-    onBack: () -> Unit,
     dialogState: (SavedDishesDialogState) -> Unit,
-    onSaveDish: () -> Unit
+    onSaveDish: () -> Unit,
+    navigateToAddTotalWeightScreen: () -> Unit,
+    onBack: () -> Unit
 ) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+        DishPart(
+            state = dishState,
+            onChangeWeight = navigateToAddTotalWeightScreen
+        )
 
-    Scaffold(
-        topBar = {
-            EditTopBar(
-                onBack = onBack,
-                onAddIngredient = {
-                    dialogState(SavedDishesDialogState.AddIngredient)
-                })
-        }
-    ) { paddingValues ->
+        IngredientList(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            listOfIngredients = ingredientsState.ingredients,
+            onDeleteIngredient = { ingredient ->
+                dialogState(SavedDishesDialogState.DeleteIngredient(ingredient))
+            },
+            onEditIngredient = { ingredient ->
+                dialogState(SavedDishesDialogState.EditIngredient(ingredient))
+            }
+        )
 
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            DishPart(
-                state = dishState,
-                showChangeWeight = { weight ->
-                    dialogState(SavedDishesDialogState.EditWeight(weight))
-                })
-
-
-            IngredientList(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                listOfIngredients = ingredientsState.ingredients,
-                onDeleteIngredient = { ingredient ->
-                    dialogState(SavedDishesDialogState.DeleteIngredient(ingredient))
-                },
-                onEditIngredient = { ingredient ->
-                    dialogState(SavedDishesDialogState.EditIngredient(ingredient))
-                })
-
-            DualButtonPanel(
-                leftButtonIcon = Icons.Default.Close,
-                leftButtonText = R.string.cancel,
-                rightButtonIcon = Icons.Default.Done,
-                rightButtonText = R.string.save
-            ) { buttonType ->
-                when (buttonType) {
-                    LEFT_BUTTON -> onBack()
-                    RIGHT_BUTTON -> onSaveDish()
-                }
+        DualButtonPanel(
+            leftButtonIcon = Icons.Default.Close,
+            leftButtonText = R.string.cancel,
+            rightButtonIcon = Icons.Default.Done,
+            rightButtonText = R.string.save
+        ) { buttonType ->
+            when (buttonType) {
+                LEFT_BUTTON -> onBack()
+                RIGHT_BUTTON -> onSaveDish()
             }
         }
     }
@@ -175,106 +154,57 @@ fun EditDishView(
 @Composable
 fun DishPart(
     state: DishState,
-    showChangeWeight: (Double) -> Unit,
+    onChangeWeight: () -> Unit,
 ) {
-    var weight by remember { mutableStateOf(state.totalWeight.toString()) }
+    var weight by remember { mutableStateOf(state.totalWeight) }
 
-    LaunchedEffect(state.totalWeight) {
-        weight = state.totalWeight.toString()
-    }
+    val scrollableState = rememberScrollState()
 
-    Card(
+//    LaunchedEffect(state.totalWeight) {
+//        weight = state.totalWeight.toString()
+//    }
+
+    Column(
+        horizontalAlignment = Alignment.Start,
         modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-            .fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
+            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp, top = 16.dp)
+            .verticalScroll(scrollableState)
     ) {
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(16.dp)
-        ) {
-            Text(
-                text = state.name, style = MaterialTheme.typography.titleLarge, fontSize = 26.sp
-            )
-            Spacer(modifier = Modifier.padding(16.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                LabeledRollerValue(value = state.finalKcal, label = R.string.kkal)
-                LabeledRollerValue(value = state.finalFats, label = R.string.fats)
-                LabeledRollerValue(value = state.finalCarbs, label = R.string.carbs)
-                LabeledRollerValue(value = state.finalProteins, label = R.string.proteins)
-            }
-            Spacer(modifier = Modifier.padding(8.dp))
-            WeightValue(weight = weight, showChangeWeight = showChangeWeight)
-        }
-    }
-}
+        Text(
+            text = state.name,
+            style = MaterialTheme.typography.titleLarge,
+            fontSize = 22.sp
+        )
+        Spacer(modifier = Modifier.padding(8.dp))
 
-@Composable
-fun WeightValue(modifier: Modifier = Modifier, weight: String, showChangeWeight: (Double) -> Unit) {
-    val clipboardManager = LocalClipboardManager.current
-    Column(horizontalAlignment = Alignment.Start) {
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                modifier = Modifier.clickable {
-                    clipboardManager.setText(AnnotatedString(weight))
-                },
-                text = weight,
-                style = MaterialTheme.typography.bodyMedium,
-                fontSize = 30.sp
-            )
-            IconButton(onClick = {
-                showChangeWeight(weight.toDouble())
+            Column {
+                LabeledRollerValue(value = state.finalFats, label = R.string.fats)
+                Spacer(modifier = Modifier.height(8.dp))
+                LabeledRollerValue(value = state.finalKcal, label = R.string.kkal)
             }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.weight)
-                )
+            Column {
+                LabeledRollerValue(value = state.finalCarbs, label = R.string.carbs)
+                Spacer(modifier = Modifier.height(8.dp))
+                Row (verticalAlignment = Alignment.Bottom){
+                    LabeledRollerValue(value = state.totalWeight, label = R.string.weight)
+                    Icon(
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                            .clickable { onChangeWeight() },
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = stringResource(R.string.weight)
+                    )
+                }
             }
+            LabeledRollerValue(value = state.finalProteins, label = R.string.proteins)
         }
-        Text(
-            text = stringResource(R.string.weight),
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Spacer(modifier = Modifier.padding(8.dp))
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun EditTopBar(
-    onBack: () -> Unit, onAddIngredient: () -> Unit
-) {
-
-    CenterAlignedTopAppBar(title = {
-        Text(
-            text = stringResource(R.string.edit_dish),
-            fontSize = 20.sp,
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }, navigationIcon = {
-        IconButton(onClick = onBack) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = stringResource(R.string.cancel)
-            )
-        }
-    }, actions = {
-        FilledIconButton(onClick = onAddIngredient) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = stringResource(R.string.cancel)
-            )
-        }
-    })
 }
 
 @Composable
@@ -346,5 +276,7 @@ fun DishEditScreenPreview() {
         dishState = dishState,
         onBack = {},
         onSaveDish = {},
-        dialogState = {})
+        dialogState = {},
+        navigateToAddTotalWeightScreen = {})
 }
+

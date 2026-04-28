@@ -5,15 +5,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Dish(
-     val id: String = "",
-     val name: String = "",
+    val id: String,
+    val name: String,
     var allKcal: Double,
     var allFats: Double,
     var allCarbs: Double,
     var allProteins: Double,
     var allWeight: Double,
-    var ingredients: List<Ingredient> = listOf()
-)  {
+    var createdAt: String,
+    var ingredients: List<Ingredient>
+){
     fun toDishDto(): DishDto {
         return DishDto().apply {
             id = this@Dish.id
@@ -23,6 +24,7 @@ data class Dish(
             allCarbs = this@Dish.allCarbs
             allProteins = this@Dish.allProteins
             allWeight = this@Dish.allWeight
+            createdAt = this@Dish.createdAt
         }
     }
 }

@@ -15,8 +15,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.buller.ckkal.R
 import com.buller.ckkal.ui.screens.Constants
+import com.buller.ckkal.ui.screens.TextWithIconButton
 import com.buller.ckkal.ui.theme.OceanGreen
 import com.buller.ckkal.ui.theme.Orange
 import com.buller.ckkal.ui.theme.Pink
@@ -62,63 +66,45 @@ fun ProfileScreen() {
     val context = LocalContext.current
     val packageName = context.packageName
     val launchPlayStoreForApp = { launchPlayStoreForApp(context, packageName) }
+    val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+            .padding(start = 16.dp, end = 16.dp).imePadding()
+            .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+
+        ) {
         HelloPart()
-        Spacer(modifier = Modifier.padding(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         SendEmailButton(onCLick = {
             sendEmail(context = context, emailAddress = Constants.SUPPORT_EMAIL)
         })
-        Spacer(modifier = Modifier.padding(4.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-        ) {
-            RateAppButton(modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(), onCLick = {
+        Spacer(modifier = Modifier.height(8.dp))
+        RateAppButton(
+            onCLick = {
                 showRateDialog = true
             })
-            Spacer(modifier = Modifier.width(4.dp))
-            val linkText = stringResource(R.string.try_app)
-            val shareText = stringResource(R.string.share_app)
-            ShareAppButton(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(),
-                onCLick = {
-                    shareAppIntent(
-                        context = context,
-                        linkText = linkText,
-                        shareText = shareText
-                    )
-                })
-        }
-
-        Spacer(modifier = Modifier.padding(4.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-        ) {
-            PrivacyPolicyButton(modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(), onCLick = {
+        Spacer(modifier = Modifier.height(8.dp))
+        val linkText = stringResource(R.string.try_app)
+        val shareText = stringResource(R.string.share_app)
+        ShareAppButton(
+            onCLick = {
+                shareAppIntent(
+                    context = context, linkText = linkText, shareText = shareText
+                )
+            })
+        Spacer(modifier = Modifier.height(8.dp))
+        PrivacyPolicyButton(
+            onCLick = {
                 openLink(context = context, Constants.PP_LINK)
             })
-            Spacer(modifier = Modifier.width(4.dp))
-            TermsButton(modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(), onCLick = {
+
+        Spacer(modifier = Modifier.height(8.dp))
+        TermsButton(
+            onCLick = {
                 openLink(context = context, link = Constants.TERMS_LINK)
             })
-        }
+        Spacer(modifier = Modifier.height(8.dp))
     }
     if (showRateDialog) {
         RateDialog(onDismissRequest = { showRateDialog = false }, onLaunchRateApp = {
@@ -129,53 +115,55 @@ fun ProfileScreen() {
 
 @Composable
 fun HelloPart() {
+    Spacer(modifier = Modifier.height(32.dp))
+    Image(painter = painterResource(id = R.drawable.chef_cook_icon), contentDescription = null)
+    Spacer(modifier = Modifier.height(8.dp))
     Text(
         text = stringResource(R.string.hello_info),
         fontSize = 26.sp,
         style = MaterialTheme.typography.bodyMedium,
         color = LocalContentColor.current
     )
-    Spacer(modifier = Modifier.padding(8.dp))
-    Image(painter = painterResource(id = R.drawable.chef_cook_icon), contentDescription = null)
-    Spacer(modifier = Modifier.padding(8.dp))
+
+    Spacer(modifier = Modifier.height(32.dp))
     Text(
         text = stringResource(R.string.text_for_info_1),
-        textAlign = TextAlign.Center,
+        textAlign = TextAlign.Start,
         style = MaterialTheme.typography.bodyMedium,
         color = LocalContentColor.current
     )
-    Spacer(modifier = Modifier.padding(8.dp))
+    Spacer(modifier = Modifier.height(16.dp))
     Text(
         text = stringResource(R.string.text_for_info_2),
-        textAlign = TextAlign.Center,
+        textAlign = TextAlign.Start,
         style = MaterialTheme.typography.bodyMedium,
         color = LocalContentColor.current
     )
-    Spacer(modifier = Modifier.padding(4.dp))
+    Spacer(modifier = Modifier.height(4.dp))
     Text(
         text = stringResource(R.string.text_for_info_3),
-        textAlign = TextAlign.Center,
+        textAlign = TextAlign.Start,
         style = MaterialTheme.typography.bodyMedium,
         color = LocalContentColor.current
     )
-    Spacer(modifier = Modifier.padding(8.dp))
+    Spacer(modifier = Modifier.height(16.dp))
     Text(
         text = stringResource(R.string.text_for_info_4),
-        textAlign = TextAlign.Center,
+        textAlign = TextAlign.Start,
         style = MaterialTheme.typography.bodyMedium,
         color = LocalContentColor.current
     )
-    Spacer(modifier = Modifier.padding(4.dp))
+    Spacer(modifier = Modifier.height(16.dp))
     Text(
         text = stringResource(R.string.text_for_info_5),
-        textAlign = TextAlign.Center,
+        textAlign = TextAlign.Start,
         style = MaterialTheme.typography.bodyMedium,
         color = LocalContentColor.current
     )
-    Spacer(modifier = Modifier.padding(4.dp))
+    Spacer(modifier = Modifier.height(4.dp))
     Text(
         text = stringResource(R.string.text_for_info_6),
-        textAlign = TextAlign.Center,
+        textAlign = TextAlign.Start,
         style = MaterialTheme.typography.bodyMedium,
         color = LocalContentColor.current
     )
@@ -183,147 +171,72 @@ fun HelloPart() {
 
 @Composable
 fun SendEmailButton(modifier: Modifier = Modifier, onCLick: () -> Unit) {
-    Button(
+    TextWithIconButton(
+        modifier = modifier,
+        icon = Icons.Default.Email,
+        text = R.string.send_email,
         onClick = onCLick,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primary
-            ),
-        colors = ButtonDefaults.buttonColors(
+        buttonColors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 8.dp),
-            imageVector = Icons.Default.Email,
-            contentDescription = stringResource(R.string.send_email),
-            tint = LocalContentColor.current
         )
-        Text(
-            text = stringResource(R.string.send_email),
-            style = MaterialTheme.typography.bodyMedium,
-            color = LocalContentColor.current
-        )
-    }
+    )
 }
 
 @Composable
 fun RateAppButton(modifier: Modifier = Modifier, onCLick: () -> Unit) {
-    Button(
+    TextWithIconButton(
+        modifier = modifier,
+        icon = Icons.Default.ThumbUp,
+        text = R.string.rate_app,
         onClick = onCLick,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primary
-            ),
-        colors = ButtonDefaults.buttonColors(
+        buttonColors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 8.dp),
-            imageVector = Icons.Default.ThumbUp,
-            contentDescription = stringResource(R.string.rate_app),
-            tint = LocalContentColor.current
         )
-        Text(
-            text = stringResource(R.string.rate_app),
-            style = MaterialTheme.typography.bodyMedium,
-            color = LocalContentColor.current
-        )
-    }
+    )
 }
 
 @Composable
 fun ShareAppButton(modifier: Modifier = Modifier, onCLick: () -> Unit) {
-    Button(
+    TextWithIconButton(
+        modifier = modifier,
+        icon = Icons.Default.Share,
+        text = R.string.share_app,
         onClick = onCLick,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primary
-            ),
-        colors = ButtonDefaults.buttonColors(
+        buttonColors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 8.dp),
-            imageVector = Icons.Default.Share,
-            contentDescription = stringResource(R.string.share_app),
-            tint = LocalContentColor.current
         )
-        Text(
-            text = stringResource(R.string.share_app),
-            style = MaterialTheme.typography.bodyMedium,
-            color = LocalContentColor.current
-        )
-    }
+    )
 }
 
 @Composable
 fun PrivacyPolicyButton(modifier: Modifier = Modifier, onCLick: () -> Unit) {
-    Button(
+    TextWithIconButton(
+        modifier = modifier,
         onClick = onCLick,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primary
-            ),
-        colors = ButtonDefaults.buttonColors(
+        icon = Icons.Default.Lock,
+        text = R.string.privacy_policy,
+        buttonColors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 8.dp),
-            imageVector = Icons.Default.Lock,
-            contentDescription = "",
-            tint = LocalContentColor.current
         )
-        Text(
-            text = stringResource(R.string.privacy_policy),
-            style = MaterialTheme.typography.bodyMedium,
-            color = LocalContentColor.current
-        )
-    }
+    )
 }
 
 @Composable
 fun TermsButton(modifier: Modifier = Modifier, onCLick: () -> Unit) {
-    Button(
+    TextWithIconButton(
+        modifier = modifier,
+        icon = Icons.Default.Info,
+        text = R.string.terms_and_conditions,
         onClick = onCLick,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primary
-            ),
-        colors = ButtonDefaults.buttonColors(
+        buttonColors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
-    ) {
-        Icon(
-            modifier = Modifier.padding(end = 8.dp),
-            imageVector = Icons.Default.Info,
-            contentDescription = stringResource(R.string.terms_and_conditions),
-            tint = LocalContentColor.current
         )
-        Text(
-            text = stringResource(R.string.terms_and_conditions),
-            style = MaterialTheme.typography.bodyMedium,
-            color = LocalContentColor.current
-        )
-    }
+    )
 }
 
 fun sendEmail(context: Context, emailAddress: String) {

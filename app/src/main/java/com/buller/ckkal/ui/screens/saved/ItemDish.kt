@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
@@ -27,7 +30,8 @@ import androidx.compose.ui.unit.sp
 import com.buller.ckkal.R
 import com.buller.ckkal.domain.entities.Dish
 import com.buller.ckkal.domain.entities.Ingredient
-import com.buller.ckkal.ui.screens.LabeledValue
+import com.buller.ckkal.ui.screens.views.LabeledValue
+import com.buller.ckkal.ui.screens.home.utils.DateUtils
 import com.buller.ckkal.ui.theme.CKkalTheme
 
 
@@ -40,25 +44,25 @@ fun DishView(
     Card(
         modifier = Modifier
             .padding(start = 16.dp, end = 16.dp, bottom = 4.dp, top = 4.dp)
+            .fillMaxWidth()
             .clickable { onEditDish(dish) },
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(top = 8.dp)
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 8.dp),
+                    .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.End
             ) {
                 Text(
                     text = dish.name.uppercase(),
-                    fontSize = 23.sp,
+                    fontSize = 20.sp,
                     style = MaterialTheme.typography.titleLarge,
                     fontFamily = MaterialTheme.typography.bodyMedium.fontFamily,
                     modifier = Modifier.weight(1f),
@@ -78,47 +82,64 @@ fun DishView(
                     }
                 }
             }
-        }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(horizontalAlignment = Alignment.Start) {
+                    LabeledValue(
+                        value = dish.allFats.toString(),
+                        label = R.string.fats,
+                        styleColor = MaterialTheme.colorScheme.onPrimary
+                    )
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, bottom = 24.dp)
-        ) {
-            Column(horizontalAlignment = Alignment.Start) {
-                LabeledValue(
-                    value = dish.allFats.toString(),
-                    label = R.string.fats,
-                    styleColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LabeledValue(
+                        value = dish.allKcal.toString(),
+                        label = R.string.kkal,
+                        styleColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+                Column(horizontalAlignment = Alignment.Start) {
+                    LabeledValue(
+                        value = dish.allCarbs.toString(),
+                        label = R.string.carbs,
+                        styleColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LabeledValue(
+                        value = dish.allWeight.toString(),
+                        label = R.string.weight,
+                        styleColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(16.dp))
-                LabeledValue(
-                    value = dish.allKcal.toString(),
-                    label = R.string.kkal,
-                    styleColor = MaterialTheme.colorScheme.onPrimary
-                )
+                Column(
+                    modifier = Modifier,
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    LabeledValue(
+                        value = dish.allProteins.toString(),
+                        label = R.string.proteins,
+
+                        styleColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
-            Column(horizontalAlignment = Alignment.Start) {
-                LabeledValue(
-                    value = dish.allCarbs.toString(),
-                    label = R.string.carbs,
-                    styleColor = MaterialTheme.colorScheme.onPrimary
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    modifier = Modifier.size(12.dp),
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = stringResource(R.string.date)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-                LabeledValue(
-                    value = dish.allWeight.toString(),
-                    label = R.string.weight,
-                    styleColor = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.Start) {
-                LabeledValue(
-                    value = dish.allProteins.toString(),
-                    label = R.string.proteins,
-                    styleColor = MaterialTheme.colorScheme.onPrimary
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = DateUtils.formatStringForDate(dish.createdAt),
+                    fontSize = 12.sp,
+                    fontFamily = MaterialTheme.typography.bodyMedium.fontFamily
                 )
             }
         }
@@ -129,8 +150,6 @@ fun DishView(
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-
-
     val listIngredient = listOf(
         Ingredient(
             "1",
@@ -160,7 +179,7 @@ fun GreetingPreview() {
         allCarbs = 0.9,
         allKcal = 0.9,
         allProteins = 0.9,
-        allWeight = 0.9
+        allWeight = 0.9, createdAt = System.currentTimeMillis().toString()
     )
     CKkalTheme {
         DishView(dish, onRemoveDish = {}, onEditDish = {})

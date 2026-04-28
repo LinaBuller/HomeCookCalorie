@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,15 +25,17 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.buller.ckkal.R
 import com.buller.ckkal.ui.screens.ColorPairs
+import com.buller.ckkal.ui.screens.home.CalculationResultScreen
 import com.buller.ckkal.ui.screens.roller.NumericRoller
 import com.buller.ckkal.ui.screens.states.DishState
 
 @Composable
-fun NutrientPart(modifier: Modifier = Modifier, state: DishState) {
+fun NutrientPart(state: DishState) {
     val clipboardManager = LocalClipboardManager.current
 
     Card(
@@ -42,7 +45,7 @@ fun NutrientPart(modifier: Modifier = Modifier, state: DishState) {
         )
     ) {
         Column(
-            modifier = modifier.padding(4.dp),
+            modifier = Modifier.padding(top = 16.dp,bottom = 16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -55,12 +58,13 @@ fun NutrientPart(modifier: Modifier = Modifier, state: DishState) {
                     clipboardManager.setText(AnnotatedString("${state.finalKcal}"))
                 }
             )
+            Spacer(modifier = Modifier.height(32.dp))
             Row {
                 NutrientCircle(
                     value = state.finalProteins,
                     color = ColorPairs.getProteinsPairColor(),
                     label = stringResource(R.string.proteins),
-                    size = 72.dp,
+                    size = 94.dp,
                     onClick = {
                         clipboardManager.setText(AnnotatedString("${state.finalProteins}"))
                     }
@@ -69,7 +73,7 @@ fun NutrientPart(modifier: Modifier = Modifier, state: DishState) {
                     value = state.finalFats,
                     color = ColorPairs.getFatsPairColor(),
                     label = stringResource(R.string.fats),
-                    size = 72.dp,
+                    size = 94.dp,
                     onClick = {
                         clipboardManager.setText(AnnotatedString("${state.finalFats}"))
                     }
@@ -78,13 +82,13 @@ fun NutrientPart(modifier: Modifier = Modifier, state: DishState) {
                     value = state.finalCarbs,
                     color = ColorPairs.getCarbohydratesPairColor(),
                     label = stringResource(R.string.carbs),
-                    size = 72.dp,
+                    size = 94.dp,
                     onClick = {
                         clipboardManager.setText(AnnotatedString("${state.finalCarbs}"))
                     }
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             Text(
                 text = stringResource(R.string.copy_nutrient_title),
                 style = MaterialTheme.typography.bodyMedium,
@@ -123,4 +127,17 @@ fun NutrientCircle(
                 .clickable(onClick = onClick)
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun NutrientPartPreview() {
+    val dish = DishState(
+        finalProteins = 1.0,
+        finalKcal = 1.0,
+        finalFats = 1.0,
+        finalCarbs = 1.0,
+    )
+    val state = remember { dish }
+    NutrientPart(state = state)
 }

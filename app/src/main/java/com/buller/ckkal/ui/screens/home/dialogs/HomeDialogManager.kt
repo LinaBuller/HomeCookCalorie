@@ -11,40 +11,11 @@ import com.buller.ckkal.ui.screens.states.DishState
 fun HomeDialogManager(
     dialogState: HomeDialogState,
     dishState: DishState,
-    setIngredient: (Ingredient) -> Unit,
     onRemoveIngredient: (Ingredient) -> Unit,
     onEditIngredient: (Ingredient) -> Unit,
-    onSaveDish: (String) -> Unit,
     onDismissRequest: () -> Unit,
-    onAllWeightDishComplete: (Double) -> Unit
 ) {
     when (dialogState) {
-        is HomeDialogState.AddIngredient -> {
-            AddIngredientDialog(onDismiss = { onDismissRequest() },
-                onAddIngredient = { ingredient ->
-                    setIngredient(ingredient)
-                    onDismissRequest()
-                })
-        }
-
-        is HomeDialogState.AllWeightDish -> {
-            AllWeightDishDialog(
-                onDismiss = { onDismissRequest() },
-                onAddAllWeight = { weight ->
-                    onAllWeightDishComplete(weight)
-                })
-        }
-
-        is HomeDialogState.CalculateCurrentDish -> {
-            CalculationDialog(
-                onDismiss = { onDismissRequest() },
-                state = dishState,
-                onSaveDishes = {dishName->
-                    onSaveDish(dishName)
-                    onDismissRequest()
-                })
-        }
-
         is HomeDialogState.DeleteIngredient -> {
             DeleteDialog(item = dialogState.ingredient,
                 confirmationText = stringResource(R.string.delete),

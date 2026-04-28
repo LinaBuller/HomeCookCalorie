@@ -53,7 +53,8 @@ class DishEditViewModel
             allFats = _dish.value.finalFats,
             allKcal = _dish.value.finalKcal,
             allCarbs = _dish.value.finalCarbs,
-            allProteins = _dish.value.finalProteins
+            allProteins = _dish.value.finalProteins,
+            createdAt = System.currentTimeMillis().toString()
         )
         updateDish(dish)
     }
@@ -117,5 +118,6 @@ class DishEditViewModel
             }
             currentState.copy(ingredients = updatedIngredients)
         }
+        calculateCurrentDish()
     }
 }

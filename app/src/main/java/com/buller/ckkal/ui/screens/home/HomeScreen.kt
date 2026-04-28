@@ -17,72 +17,51 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.buller.ckkal.R
 import com.buller.ckkal.domain.entities.Ingredient
 import com.buller.ckkal.ui.screens.ColorPairs
-import com.buller.ckkal.ui.screens.DualButtonPanel
-import com.buller.ckkal.ui.screens.LEFT_BUTTON
-import com.buller.ckkal.ui.screens.DataOrPlaceholder
-import com.buller.ckkal.ui.screens.RIGHT_BUTTON
+import com.buller.ckkal.ui.screens.views.DualButtonPanel
+import com.buller.ckkal.ui.screens.views.LEFT_BUTTON
+import com.buller.ckkal.ui.screens.views.DataOrPlaceholder
+import com.buller.ckkal.ui.screens.views.RIGHT_BUTTON
 import com.buller.ckkal.ui.screens.SharedViewModel
 import com.buller.ckkal.ui.screens.home.dialogs.HomeDialogManager
 import com.buller.ckkal.ui.screens.home.views.CollapsibleCard
 import com.buller.ckkal.ui.screens.home.dialogs.HomeDialogState
 import com.buller.ckkal.ui.screens.states.DishState
 import com.buller.ckkal.ui.screens.states.IngredientsState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeRoute(
-    modifier: Modifier = Modifier,
     sharedViewModel: SharedViewModel = hiltViewModel(),
-    onAddIngredient: () -> Unit,
-    onAddTotalWeight: () -> Unit
+    navigateToAddIngredientScreen: () -> Unit,
+    navigateToAddTotalWeight: () -> Unit
 ) {
     val state by sharedViewModel.ingredientsState.collectAsStateWithLifecycle()
     val dishState by sharedViewModel.dish.collectAsStateWithLifecycle()
 
-    val calculateDish = {
-        sharedViewModel.calculateCurrentDish()
-    }
-    val onSaveDish = { dishName: String ->
-        sharedViewModel.setDishName(dishName)
-        sharedViewModel.saveDish()
-    }
-
     HomeScreen(
-        modifier = modifier,
         state = state,
         dishState = dishState,
-        setIngredient = sharedViewModel::setIngredient,
-        setWeight = sharedViewModel::setWeight,
-        onCalculateDish = calculateDish,
+        setWeight = sharedViewModel::setTotalWeight,
         onRemoveIngredient = sharedViewModel::removeIngredient,
-        onEditIngredient = sharedViewModel::setIngredient,
-        onSaveDish = onSaveDish,
-        onAddIngredient = onAddIngredient,
-        onAddTotalWeight = onAddTotalWeight
+        onEditIngredient = sharedViewModel::editIngredient,
+        onAddIngredient = navigateToAddIngredientScreen,
+        onAddTotalWeight = navigateToAddTotalWeight
     )
 }
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     state: IngredientsState,
     dishState: DishState,
-    setIngredient: (Ingredient) -> Unit,
     setWeight: (Double) -> Unit,
-    onCalculateDish: () -> Unit,
     onRemoveIngredient: (Ingredient) -> Unit,
     onEditIngredient: (Ingredient) -> Unit,
-    onSaveDish: (String) -> Unit,
     onAddIngredient: () -> Unit,
     onAddTotalWeight: () -> Unit
 ) {
     val ingredients: List<Ingredient> = state.ingredients
     var dialogState by remember { mutableStateOf<HomeDialogState>(HomeDialogState.Closed) }
 
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+    Column(modifier = Modifier.imePadding().fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
 
         DataOrPlaceholder(
             modifier = Modifier
@@ -126,19 +105,8 @@ fun HomeScreen(
     HomeDialogManager(
         dialogState = dialogState,
         dishState = dishState,
-        setIngredient = setIngredient,
         onRemoveIngredient = onRemoveIngredient,
         onEditIngredient = onEditIngredient,
-        onSaveDish = onSaveDish,
-        onAllWeightDishComplete = { weight ->
-            setWeight(weight)
-            CoroutineScope(Dispatchers.Main).launch {
-                onCalculateDish.invoke()
-                delay(300)
-                dialogState = HomeDialogState.CalculateCurrentDish
-            }
-            //TODO Think about it
-        },
         onDismissRequest = { dialogState = HomeDialogState.Closed }
     )
 }
@@ -216,12 +184,9 @@ fun HomeScreenPreview() {
     HomeScreen(
         state = state,
         dishState = dishState,
-        setIngredient = {},
         setWeight = {},
         onRemoveIngredient = {},
         onEditIngredient = {},
-        onCalculateDish = {},
-        onSaveDish = {},
         onAddIngredient = {},
         onAddTotalWeight = {}
     )
