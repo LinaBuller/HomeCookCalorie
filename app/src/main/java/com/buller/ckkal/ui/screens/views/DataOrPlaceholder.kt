@@ -20,7 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun  DataOrPlaceholder(
+fun DataOrPlaceholder(
     modifier: Modifier = Modifier,
     isNotEmpty: Boolean,
     @DrawableRes icon: Int,

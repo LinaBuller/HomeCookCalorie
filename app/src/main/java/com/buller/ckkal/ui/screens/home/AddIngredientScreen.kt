@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -177,7 +179,8 @@ fun NutrientsForm(
         modifier =  Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top
     ) {
         Column(
-            modifier = Modifier.weight(1f).verticalScroll(scrollState).padding(16.dp),
+            modifier = Modifier.weight(1f).verticalScroll(scrollState)
+                .padding(horizontal = 16.dp),
         ) {
             CustomOutlinedTextField(
                 value = uiState.ingredientName,
@@ -292,7 +295,6 @@ fun NutrientsForm(
 
         val imeBottomPadding = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
         val safeBottomPadding = (imeBottomPadding - bottomBarHeight).coerceAtLeast(0.dp)
-        Spacer(modifier = Modifier.height(8.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()

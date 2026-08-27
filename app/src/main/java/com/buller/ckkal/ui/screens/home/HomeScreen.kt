@@ -1,15 +1,23 @@
 package com.buller.ckkal.ui.screens.home
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,16 +25,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.buller.ckkal.R
 import com.buller.ckkal.domain.entities.Ingredient
 import com.buller.ckkal.ui.screens.ColorPairs
-import com.buller.ckkal.ui.screens.views.DualButtonPanel
-import com.buller.ckkal.ui.screens.views.LEFT_BUTTON
-import com.buller.ckkal.ui.screens.views.DataOrPlaceholder
-import com.buller.ckkal.ui.screens.views.RIGHT_BUTTON
 import com.buller.ckkal.ui.screens.SharedViewModel
 import com.buller.ckkal.ui.screens.home.dialogs.HomeDialogManager
-import com.buller.ckkal.ui.screens.home.views.CollapsibleCard
 import com.buller.ckkal.ui.screens.home.dialogs.HomeDialogState
+import com.buller.ckkal.ui.screens.home.views.CollapsibleCard
 import com.buller.ckkal.ui.screens.states.DishState
 import com.buller.ckkal.ui.screens.states.IngredientsState
+import com.buller.ckkal.ui.screens.views.DataOrPlaceholder
+import com.buller.ckkal.ui.screens.views.DualButtonPanel
+import com.buller.ckkal.ui.screens.views.LEFT_BUTTON
+import com.buller.ckkal.ui.screens.views.RIGHT_BUTTON
 
 @Composable
 fun HomeRoute(
@@ -61,7 +69,13 @@ fun HomeScreen(
     val ingredients: List<Ingredient> = state.ingredients
     var dialogState by remember { mutableStateOf<HomeDialogState>(HomeDialogState.Closed) }
 
-    Column(modifier = Modifier.imePadding().fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
+    Column(
+        modifier = Modifier
+            .imePadding()
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Bottom
+    ) {
 
         DataOrPlaceholder(
             modifier = Modifier
@@ -81,9 +95,7 @@ fun HomeScreen(
         }
 
         DualButtonPanel(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent),
+            modifier = Modifier.fillMaxWidth(),
             enabledRightButton = ingredients.isNotEmpty(),
             leftButtonIcon = Icons.Default.Add,
             leftButtonText = R.string.add_ingredient,

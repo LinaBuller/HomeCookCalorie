@@ -9,8 +9,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
     id("kotlinx-serialization")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
-
+    alias(libs.plugins.compose.compiler)
 }
 
 val keystoreProperties = Properties().apply {
@@ -22,7 +21,7 @@ android {
 
     defaultConfig {
         applicationId = "com.buller.ckkal"
-        minSdk = 28
+        minSdk = 35
         targetSdk = 35
         versionCode = 4
         versionName = "1.1.1"
@@ -51,6 +50,7 @@ android {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -62,20 +62,17 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
         compose = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"

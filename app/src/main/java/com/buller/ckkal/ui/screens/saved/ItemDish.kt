@@ -30,8 +30,8 @@ import androidx.compose.ui.unit.sp
 import com.buller.ckkal.R
 import com.buller.ckkal.domain.entities.Dish
 import com.buller.ckkal.domain.entities.Ingredient
-import com.buller.ckkal.ui.screens.views.LabeledValue
 import com.buller.ckkal.ui.screens.home.utils.DateUtils
+import com.buller.ckkal.ui.screens.views.LabeledValue
 import com.buller.ckkal.ui.theme.CKkalTheme
 
 
@@ -43,7 +43,6 @@ fun DishView(
 ) {
     Card(
         modifier = Modifier
-            .padding(start = 16.dp, end = 16.dp, bottom = 4.dp, top = 4.dp)
             .fillMaxWidth()
             .clickable { onEditDish(dish) },
         shape = MaterialTheme.shapes.medium,
@@ -52,7 +51,7 @@ fun DishView(
     ) {
         Column(
             horizontalAlignment = Alignment.End,
-            modifier = Modifier.padding(top = 8.dp, bottom = 8.dp, start = 16.dp, end = 16.dp)
+            modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp)
         ) {
             Row(
                 modifier = Modifier
